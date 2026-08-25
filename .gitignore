@@ -1,0 +1,40 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# Environment variables & secrets (CRITICAL)
+.env
+
+# Vector database local storage
+chroma_db/
+chromadb_data/
+
+# Streamlit runtime data
+.streamlit/
+
+# OS specific files
+.DS_Store
+Thumbs.db
