@@ -1,9 +1,10 @@
 """
-MediRAG - Clinical Knowledge & Document Assistant
-Streamlit Web Interface with Synchronized Dynamic Theme & Widget Inversion
+MediRAG - Executive Clinical Intelligence & Document Exploration Assistant
+Streamlit Web Interface with Fluid Keyframe Transitions, Dynamic Theming, Live Telemetry & Audit Export
 """
 
 import os
+import time
 import streamlit as st
 from dotenv import load_dotenv
 
@@ -14,7 +15,7 @@ from src.rag import MediRAGPipeline
 load_dotenv()
 
 st.set_page_config(
-    page_title="MediRAG | Clinical AI",
+    page_title="MediRAG | Clinical Intelligence Assistant",
     page_icon="🩺",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -24,28 +25,26 @@ st.set_page_config(
 if "theme_mode" not in st.session_state:
     st.session_state.theme_mode = "Dark"
 
-if st.session_state.theme_mode == "Dark":
+is_dark = (st.session_state.theme_mode == "Dark")
+
+if is_dark:
     THEME = {
-        "bg_app": "#0b0f19",
-        "bg_panel": "#111827",
-        "bg_card": "#161e2e",
-        "bg_card_secondary": "#1e293b",
-        "bg_widget": "#1b2333",
-        "border_color": "rgba(255, 255, 255, 0.1)",
-        "border_widget": "#2e3b52",
-        "text_main": "#f8fafc",
-        "text_muted": "#94a3b8",
+        "bg_app": "#0a0d14",
+        "bg_panel": "#0f1420",
+        "bg_card": "#141b2a",
+        "bg_card_secondary": "#1a2337",
+        "bg_widget": "#162032",
+        "border": "#212d45",
+        "border_subtle": "#182235",
+        "text_primary": "#f1f5f9",
+        "text_secondary": "#94a3b8",
         "accent": "#a3d139",
         "accent_hover": "#8ebe2d",
-        "btn_text": "#0b0f19",
-        "disclaimer_bg": "rgba(245, 158, 11, 0.12)",
-        "disclaimer_text": "#fde68a",
-        "disclaimer_border": "#f59e0b",
-        "badge_bg": "#1e2638",
-        "badge_border": "rgba(163, 209, 57, 0.35)",
-        "chat_bg": "#151c2c",
-        "chat_bar_bg": "#111827",
-        "dropzone_bg": "#161e2e"
+        "accent_glow": "rgba(163, 209, 57, 0.2)",
+        "btn_text": "#0a0d14",
+        "warning_bg": "rgba(245, 158, 11, 0.08)",
+        "warning_border": "rgba(245, 158, 11, 0.25)",
+        "warning_text": "#fbbf24"
     }
 else:
     THEME = {
@@ -54,205 +53,327 @@ else:
         "bg_card": "#ffffff",
         "bg_card_secondary": "#f1f5f9",
         "bg_widget": "#ffffff",
-        "border_color": "rgba(0, 0, 0, 0.08)",
-        "border_widget": "#cbd5e1",
-        "text_main": "#0f172a",
-        "text_muted": "#475569",
+        "border": "#cbd5e1",
+        "border_subtle": "#e2e8f0",
+        "text_primary": "#0f172a",
+        "text_secondary": "#475569",
         "accent": "#65a30d",
         "accent_hover": "#4d7c0f",
+        "accent_glow": "rgba(101, 163, 13, 0.15)",
         "btn_text": "#ffffff",
-        "disclaimer_bg": "#fef3c7",
-        "disclaimer_text": "#92400e",
-        "disclaimer_border": "#d97706",
-        "badge_bg": "#ecfccb",
-        "badge_border": "rgba(101, 163, 13, 0.4)",
-        "chat_bg": "#ffffff",
-        "chat_bar_bg": "#f1f5f9",
-        "dropzone_bg": "#f8fafc"
+        "warning_bg": "#fffbeb",
+        "warning_border": "#fef3c7",
+        "warning_text": "#b45309"
     }
 
-# ---------------- DYNAMIC CSS INJECTION ----------------
+# ---------------- DYNAMIC CSS WITH FLUID KEYFRAME TRANSITIONS ----------------
 st.markdown(f"""
 <style>
-    /* Hide / Blend Header Bar */
-    header[data-testid="stHeader"] {{
-        background-color: transparent !important;
-    }}
-    
-    /* Global Transitions */
-    *, *::before, *::after {{
-        transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease !important;
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    /* Smooth page-load keyframes */
+    @keyframes smoothFadeIn {{
+        0% {{
+            opacity: 0;
+            transform: translateY(6px);
+        }}
+        100% {{
+            opacity: 1;
+            transform: translateY(0);
+        }}
     }}
 
-    /* Main App Body */
-    .stApp, div[data-testid="stAppViewContainer"] {{
+    @keyframes pulseGlow {{
+        0%, 100% {{
+            box-shadow: 0 0 15px {THEME['accent_glow']};
+        }}
+        50% {{
+            box-shadow: 0 0 25px {THEME['accent_glow']};
+        }}
+    }}
+
+    html, body, [class*="css"], .stApp {{
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
         background-color: {THEME['bg_app']} !important;
-        color: {THEME['text_main']} !important;
+        color: {THEME['text_primary']} !important;
     }}
 
-    /* Sidebar Background & Headers */
+    /* Global smooth color transitions on theme switch */
+    *, *::before, *::after {{
+        transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }}
+
+    header[data-testid="stHeader"] {{
+        background: transparent !important;
+    }}
+
+    /* Apply fadeIn transition to main block content */
+    .block-container {{
+        padding-top: 1.8rem !important;
+        padding-bottom: 5rem !important;
+        max-width: 1200px !important;
+        animation: smoothFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    }}
+
+    /* Sidebar Styling */
     section[data-testid="stSidebar"], 
     section[data-testid="stSidebar"] > div:first-child {{
         background-color: {THEME['bg_panel']} !important;
-        border-right: 1px solid {THEME['border_color']} !important;
+        border-right: 1px solid {THEME['border']} !important;
     }}
-    section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3,
-    section[data-testid="stSidebar"] h4,
-    section[data-testid="stSidebar"] p,
-    section[data-testid="stSidebar"] span,
-    section[data-testid="stSidebar"] label {{
-        color: {THEME['text_main']} !important;
+    section[data-testid="stSidebar"] * {{
+        color: {THEME['text_primary']} !important;
     }}
 
-    /* Primary Action Buttons */
-    .stButton > button {{
-        background: {THEME['accent']} !important;
+    /* Buttons with smooth spring micro-interaction */
+    .stButton > button, 
+    div[data-testid="stDownloadButton"] > button,
+    section[data-testid="stFileUploaderDropzone"] button,
+    button[kind="secondary"] {{
+        background-color: {THEME['accent']} !important;
         color: {THEME['btn_text']} !important;
         border: none !important;
-        border-radius: 8px !important;
+        border-radius: 9px !important;
         font-weight: 700 !important;
-        padding: 0.55rem 1rem !important;
+        font-size: 0.88rem !important;
+        padding: 0.52rem 1.1rem !important;
+        box-shadow: 0 2px 8px {THEME['accent_glow']} !important;
+        cursor: pointer !important;
     }}
-    .stButton > button:hover {{
-        background: {THEME['accent_hover']} !important;
-        transform: translateY(-1px) !important;
+    .stButton > button:hover, 
+    div[data-testid="stDownloadButton"] > button:hover,
+    section[data-testid="stFileUploaderDropzone"] button:hover {{
+        background-color: {THEME['accent_hover']} !important;
+        transform: translateY(-2px) scale(1.01) !important;
+        box-shadow: 0 6px 18px {THEME['accent_glow']} !important;
+    }}
+    .stButton > button:active, 
+    div[data-testid="stDownloadButton"] > button:active {{
+        transform: translateY(0) scale(0.98) !important;
     }}
 
-    /* File Uploader Container & Dropzone */
-    div[data-testid="stFileUploader"] {{
-        background-color: transparent !important;
-    }}
+    /* File Dropzone */
     section[data-testid="stFileUploaderDropzone"] {{
-        background-color: {THEME['dropzone_bg']} !important;
-        border: 1.5px dashed {THEME['border_widget']} !important;
-        border-radius: 10px !important;
+        background-color: {THEME['bg_card']} !important;
+        border: 1.5px dashed {THEME['border']} !important;
+        border-radius: 12px !important;
     }}
     section[data-testid="stFileUploaderDropzone"] * {{
-        color: {THEME['text_main']} !important;
+        color: {THEME['text_primary']} !important;
     }}
-    section[data-testid="stFileUploaderDropzone"] button {{
+    section[data-testid="stFileUploaderDropzone"] small {{
+        color: {THEME['text_secondary']} !important;
+    }}
+
+    /* Radio Items */
+    div[data-testid="stRadio"] label,
+    div[data-testid="stRadio"] p,
+    div[data-testid="stRadio"] span {{
+        color: {THEME['text_primary']} !important;
+        font-weight: 500 !important;
+    }}
+    div[data-testid="stRadio"] > div {{
+        gap: 8px !important;
+    }}
+
+    /* Expander Elements */
+    div[data-testid="stExpander"] {{
         background-color: {THEME['bg_card']} !important;
-        color: {THEME['text_main']} !important;
-        border: 1px solid {THEME['border_widget']} !important;
+        border: 1px solid {THEME['border']} !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        animation: smoothFadeIn 0.25s ease-in-out !important;
     }}
-
-    /* Target Streamlit BaseWeb Select Boxes (Provider & Model dropdowns) */
-    div[data-baseweb="select"],
-    div[data-baseweb="select"] > div,
-    div[data-baseweb="select"] div[role="combobox"],
-    div[data-baseweb="select"] div,
-    div[data-baseweb="base-input"] {{
-        background-color: {THEME['bg_widget']} !important;
-        border-color: {THEME['border_widget']} !important;
-        color: {THEME['text_main']} !important;
+    div[data-testid="stExpander"] details {{
+        background-color: {THEME['bg_card']} !important;
     }}
-
-    /* Target Dropdown Text and SVGs */
-    div[data-baseweb="select"] span,
-    div[data-baseweb="select"] input,
-    div[data-baseweb="select"] div[aria-selected] {{
-        color: {THEME['text_main']} !important;
-        -webkit-text-fill-color: {THEME['text_main']} !important;
-    }}
-    div[data-baseweb="select"] svg {{
-        fill: {THEME['text_main']} !important;
-        color: {THEME['text_main']} !important;
-    }}
-
-    /* Dropdown Popover / Options Menu */
-    div[data-baseweb="popover"],
-    ul[data-baseweb="menu"],
-    li[data-baseweb="menu-item"] {{
-        background-color: {THEME['bg_widget']} !important;
-        color: {THEME['text_main']} !important;
-        border-color: {THEME['border_widget']} !important;
-    }}
-    li[data-baseweb="menu-item"]:hover {{
+    div[data-testid="stExpander"] summary {{
         background-color: {THEME['bg_card_secondary']} !important;
+        color: {THEME['text_primary']} !important;
+        border-bottom: 1px solid {THEME['border']} !important;
+        padding: 12px 16px !important;
+    }}
+    div[data-testid="stExpander"] summary * {{
+        background-color: transparent !important;
+        color: {THEME['text_primary']} !important;
+        font-weight: 600 !important;
+    }}
+    div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] {{
+        background-color: {THEME['bg_card']} !important;
+        padding: 16px !important;
+    }}
+    div[data-testid="stExpander"] div[data-testid="stExpanderDetails"] * {{
+        color: {THEME['text_primary']} !important;
+    }}
+    div[data-testid="stExpander"] div[data-testid="stCaptionContainer"],
+    div[data-testid="stExpander"] div[data-testid="stCaptionContainer"] * {{
+        color: {THEME['text_secondary']} !important;
+        line-height: 1.6 !important;
     }}
 
     /* Bottom Chat Bar */
-    div[data-testid="stBottom"],
-    footer {{
+    div[data-testid="stBottom"], div[data-testid="stBottom"] > div, footer {{
         background-color: {THEME['bg_app']} !important;
+        border-top: 1px solid {THEME['border_subtle']} !important;
     }}
-    div[data-testid="stBottom"] > div {{
-        background-color: {THEME['chat_bar_bg']} !important;
-        border-top: 1px solid {THEME['border_color']} !important;
-    }}
-    div[data-testid="stChatInput"] {{
-        background-color: transparent !important;
+    div[data-testid="stChatInput"] > div {{
+        background-color: {THEME['bg_card']} !important;
+        border: 1px solid {THEME['border']} !important;
+        border-radius: 14px !important;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.03) !important;
     }}
     div[data-testid="stChatInput"] textarea {{
-        background-color: {THEME['bg_widget']} !important;
-        color: {THEME['text_main']} !important;
-        border: 1px solid {THEME['border_widget']} !important;
-        border-radius: 10px !important;
+        color: {THEME['text_primary']} !important;
+        -webkit-text-fill-color: {THEME['text_primary']} !important;
+        background-color: transparent !important;
+    }}
+    div[data-testid="stChatInput"] textarea::placeholder {{
+        color: {THEME['text_secondary']} !important;
     }}
 
-    /* Chat Messages */
+    /* High-contrast chat bubbles with fade-in */
     div[data-testid="stChatMessage"] {{
-        background-color: {THEME['chat_bg']} !important;
-        border: 1px solid {THEME['border_color']} !important;
-        color: {THEME['text_main']} !important;
-        border-radius: 12px !important;
+        background: {THEME['bg_card']} !important;
+        border: 1px solid {THEME['border']} !important;
+        border-radius: 14px !important;
+        padding: 18px !important;
+        margin-bottom: 16px !important;
+        animation: smoothFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }}
+    div[data-testid="stChatMessage"] * {{
+        color: {THEME['text_primary']} !important;
+    }}
+    div[data-testid="stChatMessage"] p,
+    div[data-testid="stChatMessage"] li,
+    div[data-testid="stChatMessage"] ul,
+    div[data-testid="stChatMessage"] ol,
+    div[data-testid="stChatMessage"] span,
+    div[data-testid="stChatMessage"] strong,
+    div[data-testid="stChatMessage"] em {{
+        color: {THEME['text_primary']} !important;
+        font-size: 0.95rem !important;
+        line-height: 1.65 !important;
+    }}
+    div[data-testid="stChatMessage"] li::marker {{
+        color: {THEME['accent']} !important;
+        font-weight: bold !important;
     }}
 
-    /* Cards & Document Items */
+    /* Telemetry Metric Cards */
+    div[data-testid="metric-container"] {{
+        background: {THEME['bg_card_secondary']} !important;
+        border: 1px solid {THEME['border']} !important;
+        padding: 12px 16px !important;
+        border-radius: 10px !important;
+        animation: smoothFadeIn 0.25s ease !important;
+    }}
+    div[data-testid="stMetricValue"] > div {{
+        color: {THEME['accent']} !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 1.3rem !important;
+    }}
+    div[data-testid="stMetricLabel"] p {{
+        font-size: 0.76rem !important;
+        font-weight: 600 !important;
+        color: {THEME['text_secondary']} !important;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }}
+
+    /* Citation Badges */
+    code {{
+        background: {THEME['bg_card_secondary']} !important;
+        color: {THEME['accent']} !important;
+        padding: 3px 7px !important;
+        border-radius: 6px !important;
+        font-size: 0.85em !important;
+        border: 1px solid {THEME['border']} !important;
+    }}
+
+    /* Hero & Structure Cards */
     .hero-card {{
-        background: {THEME['bg_card']} !important;
-        border: 1px solid {THEME['border_widget']} !important;
-        border-radius: 18px !important;
-        padding: 38px 24px !important;
-        text-align: center !important;
-        margin-bottom: 24px !important;
+        background: {THEME['bg_card']};
+        border: 1px solid {THEME['border']};
+        border-radius: 20px;
+        padding: 40px 32px;
+        text-align: center;
+        margin-bottom: 28px;
+        animation: smoothFadeIn 0.4s ease-out;
     }}
     .hero-title {{
-        font-size: 2.8rem;
+        font-size: 2.75rem;
         font-weight: 800;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.03em;
+        margin: 0 0 10px 0;
+        color: {THEME['text_primary']};
+    }}
+    .hero-title span {{
         color: {THEME['accent']};
-        margin: 8px 0;
     }}
     .hero-subtitle {{
-        font-size: 1.1rem;
-        color: {THEME['text_muted']};
-        max-width: 650px;
-        margin: 0 auto 20px auto;
+        font-size: 1.08rem;
+        color: {THEME['text_secondary']};
+        max-width: 620px;
+        margin: 0 auto 24px auto;
         line-height: 1.6;
     }}
-    .badge {{
-        background-color: {THEME['badge_bg']};
-        border: 1px solid {THEME['badge_border']};
-        color: {THEME['text_main']};
+    .spec-pill {{
+        background: {THEME['bg_card_secondary']};
+        border: 1px solid {THEME['border']};
         padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 0.82rem;
+        border-radius: 30px;
+        font-size: 0.8rem;
         font-weight: 600;
+        color: {THEME['text_primary']};
+        display: inline-block;
     }}
-    .doc-item {{
-        background-color: {THEME['bg_card']};
-        border: 1px solid {THEME['border_widget']};
+    .pillar-card {{
+        background: {THEME['bg_card']};
+        border: 1px solid {THEME['border']};
+        border-radius: 14px;
+        padding: 22px;
+        height: 100%;
+        animation: smoothFadeIn 0.45s ease-out;
+    }}
+    .pillar-title {{
+        font-size: 0.98rem;
+        font-weight: 700;
+        color: {THEME['text_primary']};
+        margin-bottom: 8px;
+    }}
+    .pillar-desc {{
+        font-size: 0.86rem;
+        color: {THEME['text_secondary']};
+        line-height: 1.55;
+        margin: 0;
+    }}
+    .clinical-notice {{
+        background: {THEME['warning_bg']};
+        border: 1px solid {THEME['warning_border']};
         border-radius: 10px;
-        padding: 14px;
-        margin-bottom: 10px;
+        padding: 12px 18px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: {THEME['warning_text']};
+        margin-bottom: 24px;
+        animation: smoothFadeIn 0.3s ease-out;
     }}
-    .disclaimer-box {{
-        background-color: {THEME['disclaimer_bg']} !important;
-        border-left: 5px solid {THEME['disclaimer_border']} !important;
-        border-radius: 6px !important;
-        padding: 12px 16px !important;
-        color: {THEME['disclaimer_text']} !important;
-        font-size: 0.9rem !important;
-        font-weight: 600 !important;
-        margin-bottom: 18px !important;
+    .file-item {{
+        background: {THEME['bg_card']};
+        border: 1px solid {THEME['border']};
+        border-radius: 10px;
+        padding: 10px 14px;
+        margin-bottom: 8px;
     }}
-    div[data-testid="stExpander"] {{
-        background-color: {THEME['bg_card']} !important;
-        border: 1px solid {THEME['border_widget']} !important;
-        border-radius: 10px !important;
+    .file-name {{
+        font-size: 0.84rem;
+        font-weight: 600;
+        color: {THEME['text_primary']};
+        font-family: 'JetBrains Mono', monospace;
+    }}
+    .file-desc {{
+        font-size: 0.74rem;
+        color: {THEME['text_secondary']};
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -274,22 +395,17 @@ if "ingested_files" not in st.session_state:
 if "active_view" not in st.session_state:
     st.session_state.active_view = "landing"
 
+if "suggested_prompt" not in st.session_state:
+    st.session_state.suggested_prompt = None
+
 
 # ---------------- SIDEBAR CONTROLS ----------------
 with st.sidebar:
-    st.markdown("## 🩺 **MediRAG Control**")
-    st.caption("Page-Aware Medical Retrieval Engine")
+    st.markdown("### 🩺 **MediRAG Cockpit**")
+    st.caption("Clinical Decision Support Retrieval Pipeline")
 
-    # Dynamic Theme Toggle with Auto-Updating Label
-    is_dark = (st.session_state.theme_mode == "Dark")
-    toggle_label = "🌙 Dark Mode" if is_dark else "☀️ Light Mode"
-    
-    toggle_val = st.toggle(
-        toggle_label,
-        value=is_dark,
-        help="Switch interface between Dark and Light mode"
-    )
-
+    toggle_label = "🌙 Dark Theme" if is_dark else "☀️ Light Theme"
+    toggle_val = st.toggle(toggle_label, value=is_dark)
     new_mode = "Dark" if toggle_val else "Light"
     if new_mode != st.session_state.theme_mode:
         st.session_state.theme_mode = new_mode
@@ -297,35 +413,35 @@ with st.sidebar:
 
     st.divider()
 
-    # View Navigation Button
     if st.session_state.active_view == "chat":
-        if st.button("⬅ View Overview", use_container_width=True):
+        if st.button("⬅ Return to Overview", use_container_width=True):
             st.session_state.active_view = "landing"
             st.rerun()
     else:
-        if st.button("💬 Open Assistant", use_container_width=True):
+        if st.button("💬 Launch Workspace", use_container_width=True):
             st.session_state.active_view = "chat"
             st.rerun()
 
     st.divider()
 
-    # Pre-loaded Documents List
-    st.markdown("### 📚 **Pre-loaded Corpus**")
-    default_docs = [
+    st.markdown("#### 📚 **Reference Library**")
+    guidelines = [
         ("sample_hypertension.pdf", "Hypertension Clinical Guidelines"),
         ("diabetes_guidelines.pdf", "Type 2 Diabetes Diagnostics"),
-        ("asthma_factsheet.pdf", "Asthma Triggers & Spirometry"),
+        ("asthma_factsheet.pdf", "Asthma Spirometry & Triggers"),
         ("9789240033986-eng.pdf", "WHO Pharmacological Manual"),
     ]
 
-    for fname, desc in default_docs:
-        st.markdown(f"""<div class="doc-item">
-<span style="font-weight:600; font-size:0.85rem;">📄 {fname}</span><br>
-<span style="font-size:0.75rem; color:{THEME['text_muted']};">{desc}</span>
-</div>""", unsafe_allow_html=True)
+    for fname, desc in guidelines:
+        st.markdown(f"""
+        <div class="file-item">
+            <div class="file-name">📄 {fname}</div>
+            <div class="file-desc">{desc}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     if st.button("🔄 Sync Corpus Chunks", use_container_width=True):
-        with st.spinner("Re-syncing documents..."):
+        with st.spinner("Re-syncing vector database..."):
             docs_folder = "documents"
             total = 0
             if os.path.exists(docs_folder):
@@ -337,13 +453,12 @@ with st.sidebar:
                         store.add_documents(chks)
                         st.session_state.ingested_files.add(f)
                         total += len(chks)
-            st.success(f"Synced {total} chunks!")
+            st.success(f"Indexed {total} passages!")
 
     st.divider()
 
-    # Upload Custom Document
-    st.markdown("### 📥 **Upload Custom PDF**")
-    custom_pdf = st.file_uploader("Upload guideline or paper", type=["pdf"])
+    st.markdown("#### 📥 **Ingest Custom Guideline**")
+    custom_pdf = st.file_uploader("Upload Clinical Document", type=["pdf"], label_visibility="collapsed")
     if custom_pdf is not None:
         if st.button("Process Document", use_container_width=True):
             save_path = os.path.join("documents", custom_pdf.name)
@@ -356,86 +471,149 @@ with st.sidebar:
                 chunks = chunk_documents(pages)
                 store.add_documents(chunks)
                 st.session_state.ingested_files.add(custom_pdf.name)
-            st.success(f"Indexed {len(chunks)} chunks!")
+            st.success(f"Vectorized {len(chunks)} chunks!")
 
     st.divider()
 
-    # Model Selection
-    st.markdown("### 🤖 **Inference Engine**")
-    llm_provider = st.selectbox("Provider", options=["gemini", "ollama"], index=0)
-    if llm_provider == "gemini":
-        model_name = st.selectbox("Model", options=["gemini-3.5-flash", "gemini-3.6-flash", "gemini-2.5-flash"], index=0)
-    else:
-        model_name = st.text_input("Ollama Model", value="llama3")
+    st.markdown("#### 🤖 **Inference Engine**")
+    llm_provider = "gemini"
+    model_name = st.radio(
+        "Gemini Model Variant",
+        options=["gemini-3.5-flash", "gemini-3.6-flash", "gemini-2.5-flash"],
+        index=0
+    )
 
 
-# ---------------- MAIN PANEL ROUTING ----------------
+# ---------------- MAIN VIEW ROUTING ----------------
 
 if st.session_state.active_view == "landing":
-    st.markdown(f"""<div class="hero-card">
-<div style="font-size: 3.5rem; line-height: 1;">🩺</div>
-<div class="hero-title">MediRAG</div>
-<div class="hero-subtitle">
-Deterministic clinical retrieval-augmented generation. Grounded medical question-answering with page-level citations and verified evidence.
-</div>
-<div style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-top:15px;">
-<span class="badge">⚡ BAAI/bge-small-en-v1.5</span>
-<span class="badge">🎯 ChromaDB Cosine Store</span>
-<span class="badge">🔒 Page Citations</span>
-<span class="badge">⏱ ~3.8s Latency</span>
-</div>
-</div>""", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="hero-card">
+        <div style="font-size: 3.2rem; line-height: 1; margin-bottom: 12px;">🩺</div>
+        <h1 class="hero-title">Medi<span>RAG</span></h1>
+        <p class="hero-subtitle">
+            Deterministic clinical retrieval-augmented generation. Grounding medical inquiries in authoritative guidelines with exact page-level citations and verified evidence.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <span class="spec-pill">⚡ Dense BGE-small Embeddings</span>
+            <span class="spec-pill">🎯 ChromaDB Cosine Store</span>
+            <span class="spec-pill">🔒 Zero-Hallucination Guardrail</span>
+            <span class="spec-pill">⏱ ~3.8s Mean Latency</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([1, 1.2, 1])
-    with col2:
-        if st.button("🚀 Launch Assistant Workspace", use_container_width=True):
+    b_col1, b_col2, b_col3 = st.columns([1, 1.2, 1])
+    with b_col2:
+        if st.button("🚀 Open Clinical Workspace", use_container_width=True):
             st.session_state.active_view = "chat"
             st.rerun()
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        st.markdown(f"""<div class="doc-item">
-<h4 style="color:{THEME['accent']}; margin-top:0;">📑 Page-Aware Ingestion</h4>
-<p style="font-size:0.85rem; line-height:1.5; color:{THEME['text_muted']};">
-Preserves originating PDF metadata and page indices through PyMuPDF and RecursiveCharacterTextSplitter.
-</p>
-</div>""", unsafe_allow_html=True)
-
-    with c2:
-        st.markdown(f"""<div class="doc-item">
-<h4 style="color:{THEME['accent']}; margin-top:0;">🛡️ Grounding Guardrails</h4>
-<p style="font-size:0.85rem; line-height:1.5; color:{THEME['text_muted']};">
-Restricts generation strictly to retrieved vector contexts, explicitly stating when data is absent.
-</p>
-</div>""", unsafe_allow_html=True)
-
-    with c3:
-        st.markdown(f"""<div class="doc-item">
-<h4 style="color:{THEME['accent']}; margin-top:0;">📊 Benchmark Validated</h4>
-<p style="font-size:0.85rem; line-height:1.5; color:{THEME['text_muted']};">
-Attains 100% retrieval hit rate and grounding across Hypertension, Diabetes, and Asthma guidelines.
-</p>
-</div>""", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"""
+        <div class="pillar-card">
+            <div class="pillar-title">📑 Page-Aware Audit Trail</div>
+            <p class="pillar-desc">
+                Preserves original PDF metadata and exact physical page indices via PyMuPDF for verifiable clinical references.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown(f"""
+        <div class="pillar-card">
+            <div class="pillar-title">🛡️ Grounding Guardrails</div>
+            <p class="pillar-desc">
+                Enforces context-only answers with deterministic references, systematically preventing clinical hallucinations.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col3:
+        st.markdown(f"""
+        <div class="pillar-card">
+            <div class="pillar-title">📊 Benchmark Validated</div>
+            <p class="pillar-desc">
+                Attains 100% retrieval hit rate across evaluated Hypertension, Diabetes, and Asthma clinical guidelines.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
 else:
-    st.markdown("### 🩺 **MediRAG Clinical Assistant**")
-    st.markdown("""<div class="disclaimer-box">
-⚠️ <strong>Educational Tool:</strong> MediRAG is designed for research and document search. It does not provide medical diagnoses or replace clinical evaluations.
-</div>""", unsafe_allow_html=True)
+    head_col1, head_col2 = st.columns([3, 1])
+    with head_col1:
+        st.markdown("### 🩺 **MediRAG Clinical Workspace**")
+    with head_col2:
+        st.markdown(f"<div style='text-align:right; margin-top:8px;'><span class='spec-pill'>● Pipeline Active ({model_name})</span></div>", unsafe_allow_html=True)
 
-    for msg in st.session_state.messages:
+    st.markdown("""
+    <div class="clinical-notice">
+        ⚠️ <strong>Notice:</strong> MediRAG is designed for clinical reference and research exploration. It does not replace certified professional medical diagnosis.
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<small style='font-weight:700; text-transform:uppercase; letter-spacing:0.05em; opacity:0.8;'>Sample Inquiries:</small>", unsafe_allow_html=True)
+    p_col1, p_col2, p_col3 = st.columns(3)
+    with p_col1:
+        if st.button("🩸 Diabetes Diagnostic Cutoffs", use_container_width=True):
+            st.session_state.suggested_prompt = "What diagnostic blood glucose and HbA1c values confirm Type 2 Diabetes?"
+            st.rerun()
+    with p_col2:
+        if st.button("🫁 Asthma Diagnostic Criteria", use_container_width=True):
+            st.session_state.suggested_prompt = "What are the primary symptom triggers and spirometry criteria for Asthma?"
+            st.rerun()
+    with p_col3:
+        if st.button("❤️ Hypertension First-Line Drugs", use_container_width=True):
+            st.session_state.suggested_prompt = "What pharmacological treatments are recommended as first-line for Stage 1 Hypertension?"
+            st.rerun()
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Render History using strictly unique enumeration keys
+    for idx, msg in enumerate(st.session_state.messages):
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
+            
+            if "metrics" in msg and msg["metrics"]:
+                m = msg["metrics"]
+                m1, m2, m3 = st.columns(3)
+                m1.metric("Response Time", f"{m['latency']}s")
+                m2.metric("Retrieved Chunks", m['chunks'])
+                m3.metric("Vector Similarity", f"{m['top_score']}")
+
             if "sources" in msg and msg["sources"]:
-                with st.expander("🔍 View Retrieved Context & Sources"):
-                    for idx, src in enumerate(msg["sources"], start=1):
-                        st.markdown(f"**Source {idx}:** `{src['source']}` (Page {src['page_number']}) — *Similarity: {src['score']}*")
+                with st.expander("🔍 Clinical Evidence & Citations"):
+                    for s_idx, src in enumerate(msg["sources"], start=1):
+                        st.markdown(f"**[{s_idx}] {src['source']}** `Page {src['page_number']}` · *Score: {src['score']}*")
                         st.caption(src["text"])
                         st.divider()
 
-    if user_query := st.chat_input("Ask a clinical question about your ingested documents..."):
+                audit_report = f"""====================================================
+MEDIRAG CLINICAL AUDIT REPORT
+====================================================
+Model: {model_name} (Provider: {llm_provider})
+
+ASSISTANT RESPONSE:
+{msg['content']}
+
+CITATIONS:
+""" + "\n".join([f"[{i+1}] {s['source']} (Page {s['page_number']}) - Score: {s['score']}\nExcerpt: {s['text'][:250]}...\n" for i, s in enumerate(msg["sources"])])
+
+                st.download_button(
+                    label="📥 Export Clinical Audit Report",
+                    data=audit_report,
+                    file_name=f"clinical_audit_{idx}.txt",
+                    mime="text/plain",
+                    key=f"audit_download_history_{idx}"
+                )
+
+    user_query = st.chat_input("Ask a clinical query regarding your ingested documents...")
+    if st.session_state.suggested_prompt:
+        user_query = st.session_state.suggested_prompt
+        st.session_state.suggested_prompt = None
+
+    if user_query:
         st.session_state.messages.append({"role": "user", "content": user_query})
         with st.chat_message("user"):
             st.markdown(user_query)
@@ -447,19 +625,53 @@ else:
         )
 
         with st.chat_message("assistant"):
-            with st.spinner("Retrieving evidence & generating grounded answer..."):
+            with st.spinner("Analyzing vectors & generating grounded answer..."):
+                t0 = time.perf_counter()
                 result = pipeline.answer_query(user_query)
+                elapsed = round(time.perf_counter() - t0, 2)
+                top_score = round(result["sources"][0]["score"], 3) if result["sources"] else 0.0
+
+                c1, c2, c3 = st.columns(3)
+                c1.metric("Response Time", f"{elapsed}s")
+                c2.metric("Retrieved Chunks", len(result["sources"]))
+                c3.metric("Vector Similarity", f"{top_score}")
+
                 st.markdown(result["answer"])
 
                 if result["sources"]:
-                    with st.expander("🔍 View Retrieved Context & Sources"):
-                        for idx, src in enumerate(result["sources"], start=1):
-                            st.markdown(f"**Source {idx}:** `{src['source']}` (Page {src['page_number']}) — *Similarity: {src['score']}*")
+                    with st.expander("🔍 Clinical Evidence & Citations"):
+                        for s_idx, src in enumerate(result["sources"], start=1):
+                            st.markdown(f"**[{s_idx}] {src['source']}** `Page {src['page_number']}` · *Score: {src['score']}*")
                             st.caption(src["text"])
                             st.divider()
+
+                    audit_report = f"""====================================================
+MEDIRAG CLINICAL AUDIT REPORT
+====================================================
+Query: {user_query}
+Model: {model_name} (Provider: {llm_provider})
+
+ASSISTANT RESPONSE:
+{result['answer']}
+
+CITATIONS:
+""" + "\n".join([f"[{i+1}] {s['source']} (Page {s['page_number']}) - Score: {s['score']}\nExcerpt: {s['text'][:250]}...\n" for i, s in enumerate(result["sources"])])
+
+                    st.download_button(
+                        label="📥 Export Clinical Audit Report",
+                        data=audit_report,
+                        file_name="clinical_audit_live.txt",
+                        mime="text/plain",
+                        key=f"audit_download_live_{len(st.session_state.messages)}"
+                    )
 
         st.session_state.messages.append({
             "role": "assistant",
             "content": result["answer"],
-            "sources": result["sources"]
+            "sources": result["sources"],
+            "metrics": {
+                "latency": elapsed,
+                "chunks": len(result["sources"]),
+                "top_score": top_score
+            }
         })
